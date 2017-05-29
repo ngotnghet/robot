@@ -1,0 +1,19 @@
+---
+# Create golden ami
+  - name: Create AMI
+    ec2_ami:
+      region: "{{ ec2_region }}"
+      instance_id: "{{ item.instance_ids[0] }}"
+      wait: yes
+      name: "cicd-goldenami-poc"
+    with_items: 
+      - "{{ hostvars['localhost']['ec2_info'] }}"
+    # ignore errors so ec2 is deleted anyway
+    ignore_errors: true
+  - name: Terminate instances that were previously launched
+    ec2:
+      region: "{{ ec2_region }}"
+      state: 'absent'
+      instance_ids: "{{ item.instance_ids[0] }}"
+    with_items:
+      - "{{ hostvars['localhost']['ec2_info'] }}"
